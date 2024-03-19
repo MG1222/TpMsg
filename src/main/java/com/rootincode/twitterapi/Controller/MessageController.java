@@ -1,5 +1,6 @@
 package com.rootincode.twitterapi.Controller;
 
+import com.rootincode.twitterapi.Model.DTO.MessageDTO;
 import com.rootincode.twitterapi.Model.Entity.Message;
 import com.rootincode.twitterapi.Service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,42 +20,29 @@ public class MessageController {
 
 
     @GetMapping
-    public Iterable<Message> showAll() {
-        return this.messageService.getAll();
+    public List<MessageDTO> showAll() {
+        return this.messageService.getAllMessageDTOs();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Message> showById(@PathVariable Integer id) {
-        Optional<Message> messageOptional = this.messageService.getById(id);
-        return messageOptional.map(user -> new ResponseEntity<>(user, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public MessageDTO showById(@PathVariable Integer id) {
+        return this.messageService.getMessageDTOById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Message> createMsg(@RequestBody Message message) {
-        Message newMsg = this.messageService.addMsg(message);
-        return new ResponseEntity<>(newMsg, HttpStatus.CREATED);
+    public MessageDTO addMessageDTO(@RequestBody MessageDTO messageDTO) {
+        return this.messageService.createMessageDTO(messageDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Message> updateMsg(@PathVariable Integer id, @RequestBody Message message) {
-        Optional<Message> existingMessageOptional = this.messageService.getById(id);
-        if (existingMessageOptional.isPresent()) {
-            Message updateMessage = this.messageService.updateByIdMsg(id, message);
-            return  new ResponseEntity<>(updateMessage, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public MessageDTO updateMessageDTO(@PathVariable Integer id, @RequestBody MessageDTO messageDTO) {
+        return this.messageService.updateMessageDTO(messageDTO, id);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMsg(@PathVariable Integer id) {
-        Optional<Message> existingMsgOptional = this.messageService.getById(id);
-        if (existingMsgOptional.isPresent()) {
-            this.messageService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public String deleteMessageDTO(@PathVariable Integer id) {
+         this.messageService.deleteMessageDTOById(id);
+         return "Deleted ";
     }
 }
